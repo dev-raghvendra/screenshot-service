@@ -17,7 +17,7 @@ const { url, width = 900, height = 563 } = req.query;
 if (!url) return res.status(400).send("Invalid or missing ?url parameter");
 
 // Generate a unique filename per request
-const filename = screenshot-${randomUUID()}.png;
+const filename = screenshot-${randomUUID()}.webp;
 const filePath = path.join(__dirname, filename);
 
 try {
