@@ -15,11 +15,12 @@ app.get("/screenshot", async (req, res) => {
   }
 
   try{
-    const img = await captureWebsite.file('https://sindresorhus.com', 'screenshot.png');
+    const img = await captureWebsite.file(url, 'screenshot.png');
  const filePath = path.join(__dirname, 'screenshot.png'); // Construct absolute path
       res.status(200).sendFile(filePath);
   }catch(e) {
     console.error(e)
+    res.status(500).send(e)
   }
   
 });
