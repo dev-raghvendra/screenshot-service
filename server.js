@@ -12,7 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.get("/screenshot", async (req, res) => {
-  const { url, width = 1280, height = 720 } = req.query;
+  const { url, width, height } = req.query;
 
   if (!url) return res.status(400).send("Invalid or missing ?url parameter");
 
@@ -21,18 +21,24 @@ app.get("/screenshot", async (req, res) => {
   const filePath = path.join(__dirname, filename);
 
   try {
+    // Build options for capture-website
+    const options = width && height
+      ? {
+          width: parseInt(width),
+          height: parseInt(height),
+          launchOptions: { args: ["--no-sandbox", "--disable-setuid-sandbox"] },
+        }
+      : {
+          preset: "desktop",
+          launchOptions: { args: ["--no-sandbox", "--disable-setuid-sandbox"] },
+        };
+
     // Capture screenshot and save to disk
-    await captureWebsite.file(url, filePath, {
-      width: parseInt(width),
-      height: parseInt(height),
-      launchOptions: {
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      },
-    });
+    await captureWebsite.file(url, filePath, options);
 
     // Send the file to the client
     res.sendFile(filePath, (err) => {
-      // Delete the file after sending to avoid clutter
+      // Delete the file after sending
       fs.unlink(filePath).catch((err) =>
         console.error("Failed to delete temp screenshot:", err)
       );
